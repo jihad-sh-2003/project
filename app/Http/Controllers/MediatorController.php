@@ -11,7 +11,7 @@ class MediatorController extends Controller
     {
         return response()->json(Mediator::all());
     }
-
+// asfdasdsd
     public function store(Request $request)
     {
         $request->validate([
