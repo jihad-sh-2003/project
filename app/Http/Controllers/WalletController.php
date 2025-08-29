@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class WalletController extends Controller
 {
-    public function index($userId)
+    public function index(Request $request)
     {
-        $user = User::findOrFail($userId);
+        $user = $request->user();
         $wallet = $user->wallet;
 
         if (!$wallet) {
@@ -23,7 +23,7 @@ class WalletController extends Controller
     }
 
     // إضافة رصيد
-    public function deposit(Request $request, $userId)
+    public function deposit(Request $request)
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -31,7 +31,7 @@ class WalletController extends Controller
             'reference_number' => 'required|string'
         ]);
 
-        $user = User::findOrFail($userId);
+        $user = $request->user();
 
         $wallet = $user->wallet ?? $user->wallet()->create([
             'balance' => 0,
@@ -56,7 +56,7 @@ class WalletController extends Controller
     }
 
     // خصم رصيد
-    public function withdraw(Request $request, $userId)
+    public function withdraw(Request $request)
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
@@ -64,15 +64,15 @@ class WalletController extends Controller
             'reference_number' => 'required|string'
         ]);
 
-        $user = User::findOrFail($userId);
+        $user = $request->user();
         $wallet = $user->wallet;
 
         if (!$wallet) {
             return response()->json(['message' => 'user has not wallet'], 404);
         }
 
-        if ($wallet->balance < $request->amount) {
-            return response()->json(['message' => 'insufficient balance '], 400);
+        if ($wallet->balance < $request->amount && $request->amount>0 ) {
+            return response()->json(['message' => 'insufficient balance ','balance'=>$wallet->balance], 400);
         }
 
         $transaction = $wallet->transactions()->create([

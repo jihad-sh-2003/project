@@ -14,15 +14,21 @@ class PropertyController extends Controller
 
      public function index()
     {
-        $properties = Property::where('approved',true)
-      ->with(['type', 'subtype', 'images' ,'documents'])->get();
+        $properties = Property::with(['type', 'subtype', 'images' ,'documents'])->get();
         return response()->
         json(['data'=>$properties ],200);
         
     }
 
+    public function count()
+    {
+        $properties=Property::where('approved',true)->get();
+        $count=$properties->count();
+        return response()->json([
+            'data'=>$count,
+        ],200);
 
-
+    }
 
     public function show($id)
     {
@@ -50,9 +56,6 @@ class PropertyController extends Controller
     }
 
 
-
-
-
     public function createProperty(PropertyRequest $request)
     {   $validated = $request->validated();
         $property= Property::create([
@@ -78,8 +81,6 @@ class PropertyController extends Controller
             ]);
             
 
-        
-   
         return response()->json([
             'message'  => 'created successfully, please wait to approve by admin',
             'property' => $property->load('type','subtype'),

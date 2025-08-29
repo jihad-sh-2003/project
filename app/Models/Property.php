@@ -69,12 +69,12 @@ class Property extends Model
 
     public function reports()
 {
-    return $this->hasMany(Rating::class);
+    return $this->hasMany(Report::class);
 }
 
 
    public function Documents()
 {
-    return $this->hasMany(Rating::class);
+    return $this->hasMany(Document::class);
 }
 }

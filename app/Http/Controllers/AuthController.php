@@ -200,6 +200,16 @@ public function deleteAccount(Request $request)
     
 }
 
+    public function count()
+    {
+        $users=User::where('is_verified',true)->get();
+        $count=$users->count();
+        return response()->json([
+            'data'=>$count,
+        ],200);
+
+    }
+
 
 
 }

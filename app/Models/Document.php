@@ -11,6 +11,7 @@ class Document extends Model
   protected $fillable=['document_type','file_path'];
 
 
+  
 
 
     public function property()

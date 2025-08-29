@@ -12,10 +12,10 @@ class PropertyImageController extends Controller
 {
    
     
-    public function addImage(Request $request, Property $property)
+    public function addImage(Request $request,$property_id)
 {
-    $this->authorize('update', $property);
 
+    $property=Property::findOrFail($property_id);
     $request->validate([
         'image' => 'required|image|max:2048',
     ]);
@@ -30,9 +30,9 @@ class PropertyImageController extends Controller
 }
 
 
-public function deleteImage(Property $property, $imageId)
+public function deleteImage( $imageId)
 {
-    $this->authorize('update', $property);
+   
     $image = PropertyImage::findOrFail($imageId);
      $image->delete();
 
@@ -45,7 +45,7 @@ public function deleteImage(Property $property, $imageId)
          $image = PropertyImage::findOrFail($imageId);
 
     // نتأكد إذا الملف موجود
-    if (!Storage::disk('public')->exists($image->image_path)) {
+    if (!Storage::disk('')->exists($image->image_path)) {
         return response()->json([
             'error' => 'Image file not found'
         ], 404);

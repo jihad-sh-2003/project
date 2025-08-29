@@ -22,7 +22,7 @@ class DocumentController extends Controller
         'file_path'=>'required|image|max:2048'
         ]);
 
-    $file_path = $request->file('file_path')->store('property_files');
+    $file_path = $request->file('file_path')->store('property_documents');
 
     $property->Documents()->create([
            'document_type'=>$request->document_type,
@@ -33,7 +33,7 @@ class DocumentController extends Controller
 }
 
 
-public function deleteDocument(Property $property, $document_id)
+public function deleteDocument( $document_id)
 {
     $document = Document::findOrFail($document_id);
      $document->delete();
@@ -42,12 +42,12 @@ public function deleteDocument(Property $property, $document_id)
 }
 
 
- public function getImageUrl($document_id)
+ public function getDocument($document_id)
     {
-         $document = Document::findOrFail($$document_id);
+         $document = Document::findOrFail($document_id);
 
     // نتأكد إذا الملف موجود
-    if (!Storage::disk('public')->exists($document->image_path)) {
+    if (!Storage::disk('')->exists($document->file_path)) {
         return response()->json([
             'error' => 'Image file not found'
         ], 404);
@@ -55,7 +55,9 @@ public function deleteDocument(Property $property, $document_id)
 
     // نرجع رابط مباشر للصورة
     return response()->json([
-        'url' => asset('storage/' . $document->image_path)
+        'document type'=>$document->document_type,
+        'url' => asset('storage/' . $document->file_path)
+        
     ]);
     }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceWorkShopsController;
@@ -56,34 +57,60 @@ Route::middleware('auth:sanctum')->controller(PropertyController::class)->group(
     Route::post('/property/filter', 'filterProperty');
 });
 
-    // الموافقة على العقارات (خاص بالـ admin / super-admin)
-    Route::middleware('role:admin|super_admin')->group(function () {
-        Route::post('/property/status', [PropertyController::class,'changeStatus']); 
-        Route::post('/property/approve/{id}', [PropertyController::class, 'approve']);
-    });
-
+ 
     // أي مستخدم يمكنه عرض العقارات
     Route::get('/property/getall', [PropertyController::class, 'index']);
-    Route::post('/property/show/{id}', [PropertyController::class, 'show']);
+    Route::get('/property/show/{id}', [PropertyController::class, 'show']);
 
 
 Route::middleware('auth:sanctum')->controller(PropertyImageController::class)->group(function(){
-    Route::post('/property/image/add','addImage');
-    Route::post('/property/image/delete/{id}','deleteImage');
-    Route::post('/property/image/geturl','getImageUrl');
+    Route::post('/property/image/add/{property_id}','addImage');
+    Route::delete('/property/image/delete/{id}','deleteImage');
+    Route::get('/property/image/geturl/{id}','getImageUrl');
 });
+
+
+
+Route::middleware('auth:sanctum')->controller(DocumentController::class)->group(function(){
+    Route::post('/property/document/add/{property_id}','addDocument');
+    Route::delete('/property/document/delete/{id}','deleteDocument');
+    Route::get('/property/document/geturl/{id}','getDocument');
+});
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites/get', [FavoriteController::class, 'index']);
-    Route::post('/favorites/store', [FavoriteController::class, 'store']);
+    Route::post('/favorites/store/{property_id}', [FavoriteController::class, 'store']);
     Route::delete('/favorites/delete/{property_id}', [FavoriteController::class, 'destroy']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/property/ratings/{property_id}', [RatingController::class, 'index']);
-    Route::post('/ratings/get', [RatingController::class, 'store']);
+    Route::post('/ratings/store', [RatingController::class, 'store']);
     Route::delete('/ratings/delete/{rating_id}', [RatingController::class, 'destroy']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/workshops/get', [MaintenanceWorkShopsController::class, 'index']);
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('banks', [BankController::class, 'index']);
+    Route::get('banks/show/{id}', [BankController::class, 'show']);
+    });
+
+ Route::middleware('auth:sanctum')->group(function () {
+ Route::get('/wallet', [WalletController::class, 'index']);
+Route::post('/wallet/deposit', [WalletController::class, 'deposit']);
+Route::post('/wallet/withdraw', [WalletController::class, 'withdraw']);
+
+});
+
+
+
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
@@ -92,58 +119,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 });
-
-
-// إرسال إشعارات للمستخدمين (خاص بالـ admin / super-admin)
-Route::middleware(['auth:sanctum','role:admin|super_admin'])->prefix('admin')->group(function () {
-    Route::post('/notifications', [NotificationController::class, 'store']); 
-});
-
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/workshops/get', [MaintenanceWorkShopsController::class, 'index']);
-});
-
-// إنشاء وحذف ورش صيانة (خاص بالـ admin / super-admin)
-Route::middleware(['auth:sanctum','role:admin|super_admin'])->group(function () {
-    Route::post('/workshops/create', [MaintenanceWorkShopsController::class, 'store']);
-    Route::delete('/workshops/delete/{WorkShopsId}', [MaintenanceWorkShopsController::class, 'destroy']);
-});
-
-
-
-
-Route::middleware('auth:sanctum')->group(function () {
-    // أي مستخدم يمكنه عرض البنوك
-    Route::get('banks', [BankController::class, 'index']);
-    Route::get('banks/show/{id}', [BankController::class, 'show']);
-
-    // admin / super-admin فقط لإنشاء، تعديل، حذف البنوك
-    Route::middleware('role:admin|super_admin')->group(function () {
-        Route::post('banks/create', [BankController::class, 'store']);
-        Route::put('banks/update/{id}', [BankController::class, 'update']);
-        Route::delete('banks/delete/{id}', [BankController::class, 'destroy']);
-    });
-
-
-
-
-
-
-
-
-
-    
-Route::get('/wallet/{user_id}', [WalletController::class, 'index']);
-Route::post('/wallet/{user_id}/deposit', [WalletController::class, 'deposit']);
-Route::post('/wallet/{user_id}/withdraw', [WalletController::class, 'withdraw']);
-
-});
-
-
-
-
-
 
 
 
@@ -222,5 +197,39 @@ Route::middleware('auth:sanctum')->controller(MediatorAppointmentController::cla
 });
 
 
+
+////////////admin+super_admin
+
+   // الموافقة على العقارات (خاص بالـ admin / super-admin)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/property/status', [PropertyController::class,'changeStatus']); 
+        Route::post('/property/approve/{id}', [PropertyController::class, 'approve']);
+    });
+
+
+
+    
+// إرسال إشعارات للمستخدمين (خاص بالـ admin / super-admin)
+Route::middleware(['auth:sanctum','role:admin|super_admin'])->prefix('admin')->group(function () {
+    Route::post('/notifications', [NotificationController::class, 'store']); 
+});
+
+// إنشاء وحذف ورش صيانة (خاص بالـ admin / super-admin)
+Route::middleware(['auth:sanctum','role:admin|super_admin'])->group(function () {
+    Route::post('/workshops/create', [MaintenanceWorkShopsController::class, 'store']);
+    Route::delete('/workshops/delete/{WorkShopsId}', [MaintenanceWorkShopsController::class, 'destroy']);
+});
+
+   // admin / super-admin فقط لإنشاء، تعديل، حذف البنوك
+    Route::middleware('role:admin|super_admin')->group(function () {
+        Route::post('banks/create', [BankController::class, 'store']);
+        Route::put('banks/update/{id}', [BankController::class, 'update']);
+        Route::delete('banks/delete/{id}', [BankController::class, 'destroy']);
+    });
+    // لارجاع عدد المستخدمين و عدد العقارات 
+    Route::middleware(['auth:sanctum',])->group(function () {
+    Route::get('/user/count', [AuthController::class, 'count']);
+    Route::get('/property/count', [PropertyController::class, 'count']);
+});
 
 

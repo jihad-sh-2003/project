@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents_verification', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
               $table->id();
             $table->string('document_type');
             $table->string('file_path');
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents_verification');
+        Schema::dropIfExists('documents');
     }
 };

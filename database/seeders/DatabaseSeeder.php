@@ -14,8 +14,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleSeeder::class);
                 $this->call(WorkshopsSeeder::class);
+        $this->call(Type_SubType_Seeder::class);
+        $this->call(BankSeeder::class);
+                $this->call(MediatorsSeeder::class);
 
-        $this->call(Governorate_City_District_Seeder::class);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

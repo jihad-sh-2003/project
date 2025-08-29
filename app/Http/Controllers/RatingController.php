@@ -9,7 +9,7 @@ use Termwind\Components\Raw;
 class RatingController extends Controller
 {
     
-public function index(Request $request ,$property_id)
+public function index($property_id)
 {
     $ratings=Rating::with('user')
     ->where('property_id',$property_id)
